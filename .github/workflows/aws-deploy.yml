@@ -18,7 +18,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -33,11 +33,12 @@ jobs:
       - name: Run tests
         run: |
           pip install pytest
-          pytest tests/ -v
+          pytest tests/ -v    
 
       - name: Build application
         run: |
           echo "Building application..."
+          mkdir -p ./build/
           # Add your build commands here
           # Example: python setup.py build
 
@@ -54,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
