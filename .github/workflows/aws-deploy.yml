@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'  # Change to your required Python version
+          python-version: '3.12'  # Change to your required Python version
 
       - name: Install dependencies
         run: |
@@ -42,8 +42,9 @@ jobs:
           # Add your build commands here
           # Example: python setup.py build
 
-      - name: Upload build artifacts    
-        uses: actions/upload-artifact@v4
+      - name: Upload build artifacts 
+        if: success()
+        uses: actions/upload-artifact@v4   
         with:
           name: app-build
           path: ./build/  # Adjust path to your build output
@@ -63,7 +64,7 @@ jobs:
           name: app-build
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
