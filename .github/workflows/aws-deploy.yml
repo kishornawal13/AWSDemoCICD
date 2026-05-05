@@ -41,7 +41,7 @@ jobs:
           # Add your build commands here
           # Example: python setup.py build
 
-      - name: Upload build artifacts
+      - name: Upload build artifacts    
         uses: actions/upload-artifact@v4
         with:
           name: app-build
@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: app-build
 
