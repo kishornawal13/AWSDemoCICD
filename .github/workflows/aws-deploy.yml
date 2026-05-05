@@ -42,7 +42,7 @@ jobs:
           # Example: python setup.py build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-build
           path: ./build/  # Adjust path to your build output
