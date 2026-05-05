@@ -1,89 +1,34 @@
-name: AWS CI/CD Pipeline
+name: Deploy to Elastic Beanstalk
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
-env:
-  AWS_REGION: us-east-1  # Change to your preferred region
-  APPLICATION_NAME: my-training-app  # Change this to your app name
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'  # Change to your required Python version
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: |
-          pip install pytest
-          pytest tests/ -v    
-
-      - name: Build application
-        run: |
-          echo "Building application..."
-          mkdir -p ./build/
-          # Add your build commands here
-          # Example: python setup.py build
-
-      - name: Upload build artifacts 
-        if: success()
-        uses: actions/upload-artifact@v4   
-        with:
-          name: app-build
-          path: ./build/  # Adjust path to your build output
-
-  deploy-to-aws:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: app-build
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}   
-
-      - name: Deploy to Elastic Beanstalk (Alternative)
-        if: false  # Set to true to enable
+      - name: Create ZIP package
         run: |
-          # Alternative deployment to Elastic Beanstalk
-          pip install awsebcli
-          eb deploy ${{ env.APPLICATION_NAME }}      
+          zip -r app.zip . -x "*.git*"
 
-      - name: Run smoke tests on deployed application
-        run: |
-          echo "Running smoke tests..."
-          # Add your smoke test commands here
-
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          application_name: my-training-app
+          environment_name: My-training-app-env
+          version_label: v-${{ github.run_number }}
+          region: us-east-1
+          deployment_package: app.zip
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
       - name: Notify deployment status
         if: always()
         run: |
-          echo "Deployment completed with status: ${{ job.status }}"
-          # You can add Slack/Email notifications here
+          echo "Deployment completed."
